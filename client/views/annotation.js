@@ -83,6 +83,12 @@ export class Annotation extends React.Component {
       na_keypoints_badge = (<span className="badge badge-success">{num_na_keypoints} N/A</span>)
     }
 
+    // Are we hidden?
+    var hiddenBadge = "";
+    if(this.props.hidden){
+      hiddenBadge = <span className="badge badge-secondary mr-1">Hidden</span>;
+    }
+
     return (
       <div className="card">
         <div className="card-header"
@@ -92,7 +98,7 @@ export class Annotation extends React.Component {
           <div className="d-flex justify-content-between">
             <div className="p-2" data-toggle="collapse" data-parent="#annotationAccordion"
               href={"#annotationBody" + this.props.id} style={{cursor : "pointer"}}>
-              <span className="badge" style={{backgroundColor: annotation_color}}>&#9634;</span>
+              <span className="badge px-2 mr-1" style={{backgroundColor: annotation_color}}></span>
               <span>{this.props.category.name}</span>
             </div>
             <div className="p-2">
@@ -100,12 +106,13 @@ export class Annotation extends React.Component {
             </div>
             <div className="p-2">
               <div className="btn-group" role="group">
-                <button type="button" className="btn btn-sm btn-secondary" onClick={this.onFocus}>Focus</button>
-                <button type="button" className="btn btn-sm btn-secondary" onClick={this.onAnnotateNA}>Annotate N/A</button>
-                <button type="button" className="btn btn-sm btn-secondary" onClick={this.onHideOthers}>Hide Others</button>
+                <button type="button" className="btn btn-sm btn-outline-secondary" onClick={this.onFocus}>Focus</button>
+                <button type="button" className="btn btn-sm btn-outline-secondary" onClick={this.onAnnotateNA}>Annotate N/A</button>
+                <button type="button" className="btn btn-sm btn-outline-secondary" onClick={this.onHideOthers}>Hide Others</button>
               </div>
             </div>
             <div className="p-2">
+              {hiddenBadge}
               <button type="button" className="btn btn-sm btn-danger" onClick={this.deleteRequested}>Delete</button>
             </div>
           </div>

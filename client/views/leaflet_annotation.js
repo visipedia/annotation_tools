@@ -1157,6 +1157,9 @@ export class LeafletAnnotation extends React.Component {
 
       }
 
+      // Rerender
+      this.setState(this.state);
+
     }
 
     /**
@@ -1205,6 +1208,9 @@ export class LeafletAnnotation extends React.Component {
 
       }
 
+      // Rerender
+      this.setState(this.state);
+
     }
 
     render() {
@@ -1243,6 +1249,12 @@ export class LeafletAnnotation extends React.Component {
             continue;
           }
 
+          // Is this annotation currently hidden?
+          var hidden=false;
+          if (this.annotationFeatures != null){ // It could be the case that we haven't rendered the map yet.
+            hidden = !this.annotationFeatures.hasLayer(this.annotation_layers[i]['bbox']);
+          }
+
           let category = this.categoryMap[annotation.category_id];
 
           var keypoint_els = [];
@@ -1255,7 +1267,8 @@ export class LeafletAnnotation extends React.Component {
                         handleDelete={ this.handleAnnotationDelete }
                         handleFocus={this.handleAnnotationFocus}
                         handleAnnotateKeypoints={this.handleAnnotateKeypoints}
-                        handleHideOthers={this.hideOtherAnnotations}/>
+                        handleHideOthers={this.hideOtherAnnotations}
+                        hidden={hidden}/>
           ));
         }
 
@@ -1284,8 +1297,8 @@ export class LeafletAnnotation extends React.Component {
                   </div>
                   <div className="p-2">
                     <div className="btn-group" role="group">
-                      <button type="button" className="btn btn-secondary" onClick={this.hideAllAnnotations}>Hide All</button>
-                      <button type="button" className="btn btn-secondary" onClick={this.showAllAnnotations}>Show All</button>
+                      <button type="button" className="btn btn-outline-secondary" onClick={this.hideAllAnnotations}>Hide All</button>
+                      <button type="button" className="btn btn-outline-secondary" onClick={this.showAllAnnotations}>Show All</button>
                     </div>
                   </div>
                   <div className="p-2">
