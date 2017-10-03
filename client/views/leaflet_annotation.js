@@ -273,11 +273,11 @@ export class LeafletAnnotation extends React.Component {
         let color = COLORS[annotationIndex % COLORS.length];
         let pathStyle = this.createBBoxPathStyle(color)
 
-        var [x1, y1, x2, y2] = annotation.bbox;
-        x1 = x1 * imageWidth;
-        y1 = y1 * imageHeight;
-        x2 = x2 * imageWidth;
-        y2 = y2 * imageHeight;
+        var [x, y, w, h] = annotation.bbox;
+        let x1 = x * imageWidth;
+        let y1 = y * imageHeight;
+        let x2 = (x + w) * imageWidth;
+        let y2 = (y + h) * imageHeight;
         let bounds = L.latLngBounds(this.leafletMap.unproject([x1, y1], 0), this.leafletMap.unproject([x2, y2], 0));
         let layer = L.rectangle(bounds, pathStyle);
 
@@ -911,12 +911,12 @@ export class LeafletAnnotation extends React.Component {
       [x1, y1] = this._restrictPointToImageBounds(x1, y1);
       [x2, y2] = this._restrictPointToImageBounds(x2, y2);
 
-      x1 = x1 / this.imageWidth;
-      y1 = y1 / this.imageHeight;
-      x2 = x2 / this.imageWidth;
-      y2 = y2 / this.imageHeight;
+      let x = x1 / this.imageWidth;
+      let y = y1 / this.imageHeight;
+      let w = (x2 - x1) / this.imageWidth;
+      let h = (y2 - y1) / this.imageHeight;
 
-      return [x1, y1, x2, y2];
+      return [x, y, w, h];
 
     }
 
@@ -1250,7 +1250,7 @@ export class LeafletAnnotation extends React.Component {
             <Annotation key={i.toString()}
                         id={i}
                         category={category}
-                        keypoints={annotation.keypoints}
+                        keypoints={annotation.keypoints ? annotation.keypoints : []}
                         handleKeypointVisibilityChange={ this.handleKeypointVisibilityChange }
                         handleDelete={ this.handleAnnotationDelete }
                         handleFocus={this.handleAnnotationFocus}
