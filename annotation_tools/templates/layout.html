@@ -1,0 +1,31 @@
+<!doctype html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-4.0.0-beta-dist/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+
+  {% block head %}
+  <title>{% block title %}{% endblock %} - VAT</title>
+  {% endblock %}
+</head>
+
+<body>
+  {% block navbar %}
+  <nav class="navbar navbar-light bg-faded">
+    <a class="navbar-brand" href="#">
+      Visipedia Annotation Toolkit
+    </a>
+  </nav>
+  {% endblock %}
+  <div class="container-fluid">
+    <div id="app">
+      {% block app %}{% endblock %}
+    </div>
+  </div>
+  {% block modals %}{% endblock %}
+  {% block scripts %}
+  <script type="text/javascript" src="{{ url_for('static', filename='app.bundle.js') }}"></script>
+  {% endblock %}
+
+</body>

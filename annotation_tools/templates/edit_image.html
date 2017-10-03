@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Edit Image{% endblock %}
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet/leaflet.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.draw/leaflet.draw.css') }}">
+
+  <style>
+  .leaflet-container{
+      height: 600px;
+      width: 600px;
+  }
+  </style>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript">
+
+  var editImageData = {
+    'image' : JSON.parse({{ image|tojson|safe }}),
+    'annotations' : JSON.parse({{ annotations|tojson|safe }}),
+    'categories' : JSON.parse({{ categories|tojson|safe }})
+  };
+
+  document.V.editImage(editImageData);
+
+</script>
+
+
+{% endblock %}

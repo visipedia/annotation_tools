@@ -1,0 +1,59 @@
+
+.circle-marker{
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #000000;
+  height: 12px;
+  width: 12px;
+}
+
+.keypoint-visibility-desc{
+  font-size: 10;
+}
+
+.default-instructions{
+
+}
+
+.keypoint-instructions{
+  background-color: #f0ad4e;
+}
+
+.bbox-instructions{
+  background-color: #f0ad4e;
+}
+
+.full-crosshair{
+  position:relative;
+  background-color:rgba(51,51,51,0.5);
+  box-shadow:0 0 5px rgb(150,150,150);
+  pointer-events:none;
+  z-index:600;
+}
+
+.full-crosshair-horizontal{
+  width:100%;
+  height:2px;
+  margin-top:-1px;
+}
+
+.full-crosshair-vertical{
+  height:100%;
+  width:2px;
+  margin-left:-2px;
+}
+
+.leaflet-editing-icon{
+  height: 15px !important;
+  width: 15px !important;
+}
+
+.task-instructions-carousel-img{
+  /*max-width: 625px !important;*/
+  height: 500px !important;
+  width: auto !important;
+}
+
+.badge:empty{
+  /* Don't want empty badges to collapse */
+  display: inline !important;
+}

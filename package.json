@@ -1,0 +1,34 @@
+{
+  "name": "visipedia_annotation_tools",
+  "version": "0.1.0",
+  "description": "Visipedia annotation tools for image datasets.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/visipedia/annotation_tools"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --watch",
+    "build": "webpack"
+  },
+  "author": "Grant Van Horn",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.7",
+    "style-loader": "^0.18.2",
+    "webpack": "^3.6.0"
+  },
+  "dependencies": {
+    "bootstrap": "^4.0.0-beta",
+    "jquery": "^3.2.1",
+    "leaflet": "^1.2.0",
+    "popper.js": "^1.12.5",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0"
+  }
+}
