@@ -1157,20 +1157,23 @@ export class LeafletAnnotation extends React.Component {
 
 
       let category = this.categoryMap[annotation.category_id];
-      this.annotation_keypoint_queue = [];
-      for (var j=0; j < category.keypoints.length; j++){
-        let index = j * 3;
-        let visibility = annotation.keypoints[index + 2];
-        if (visibility == 0){
-          this.annotation_keypoint_queue.push({
-            'annotationIndex' : annotationIndex,
-            'keypointIndex' : j
-          });
+
+      if(category.keypoints){
+
+        this.annotation_keypoint_queue = [];
+        for (var j=0; j < category.keypoints.length; j++){
+          let index = j * 3;
+          let visibility = annotation.keypoints[index + 2];
+          if (visibility == 0){
+            this.annotation_keypoint_queue.push({
+              'annotationIndex' : annotationIndex,
+              'keypointIndex' : j
+            });
+          }
         }
+
+        this.checkKeypointAnnotationQueue();
       }
-
-      this.checkKeypointAnnotationQueue();
-
     }
 
     /**
