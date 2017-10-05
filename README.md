@@ -2,7 +2,7 @@
 
 This repository contains a collection of tools for editing and creating COCO style datasets. This repo is a work in progress, you have been warned.
 
-The annotation tools are built on top of [Leaflet.js](http://leafletjs.com/).
+The annotation tools are built on top of [Leaflet.js](http://leafletjs.com/) and [Leaflet.draw](https://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html).
 
 # Requirements
 
