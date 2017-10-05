@@ -106,3 +106,7 @@ Clear the database:
 ```
 python -m annotation_tools.db_dataset_utils --action drop
 ```
+
+# Editing an Image
+
+Use the image id and go to the url `localhost:8008/edit_image/397133`, where the image id is `397133` in this case. Make any modificaiton to the image that you need to and save the annotations.

@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import 'bootstrap';
 
@@ -8,6 +9,7 @@ import '../leaflet.draw/leaflet.draw.js';
 import {COLORS} from '../utils.js';
 import {Annotation} from './annotation.js';
 import {DefaultEditInstructions, KeypointInstructions, BBoxInstructions} from './instructions.js';
+import {CategorySelectionModal} from './category_selection_modal.js';
 
 
 // Convenience class for creating circular markers of a specific color.
@@ -77,6 +79,9 @@ export class LeafletAnnotation extends React.Component {
           this.categoryMap[category['id']] = category;
         }
 
+        // BBox cross hair div elements:
+        this.bbox_crosshairs = null;
+
         this.handleKeypointVisibilityChange = this.handleKeypointVisibilityChange.bind(this);
         this.createNewInstance = this.createNewInstance.bind(this);
         this.handleAnnotationDelete = this.handleAnnotationDelete.bind(this);
@@ -90,6 +95,9 @@ export class LeafletAnnotation extends React.Component {
         this.handleKeyDown = this.handleKeyDown.bind(this);
 
         this.bboxCursorUpdate = this.bboxCursorUpdate.bind(this);
+
+        this.categorySelection = this.categorySelection.bind(this);
+        this.categorySelectionCancelled = this.categorySelectionCancelled.bind(this);
 
     }
 
@@ -165,12 +173,20 @@ export class LeafletAnnotation extends React.Component {
         this.enableEditing();
       }
 
-      // Register keypresses
-      document.addEventListener("keydown", this.handleKeyDown);
+      this.enableHotKeys();
 
     }
 
     componentWillUnmount(){
+      this.disableHotKeys();
+    }
+
+    enableHotKeys(){
+      // Register keypresses
+      document.addEventListener("keydown", this.handleKeyDown);
+    }
+
+    disableHotKeys(){
       // Unregister keypresses
       document.removeEventListener("keydown", this.handleKeyDown);
     }
@@ -412,14 +428,44 @@ export class LeafletAnnotation extends React.Component {
     }
 
     bboxCursorUpdate(e){
-      console.log('mouse move');
+      let ch_horizontal = this.bbox_crosshairs[0];
+      let ch_vertical = this.bbox_crosshairs[1];
+
+      let offset = $(this.leafletHolderEl).offset();
+
+      let x = e.pageX - offset.left;
+      let y = e.pageY - offset.top;
+
+      ch_horizontal.style.top = y + "px";
+      ch_vertical.style.left = x + "px";
     }
 
     _drawStartEvent(e){
       console.log("draw start");
 
       if(this.annotating_bbox){
-        this.leafletHolderEl.on('mousemove', this.bboxCursorUpdate);
+
+        // If the user clicks on the image (rather than clicking and dragging) then this
+        // function will be called again, but we don't want to duplicate the cross hairs.
+        if (this.bbox_crosshairs == null){
+
+          // Setup cross hair stuff
+          let ch_horizontal = document.createElement('div');
+          let ch_vertical = document.createElement('div');
+
+          ch_horizontal.className = "full-crosshair full-crosshair-horizontal";
+          ch_vertical.className = "full-crosshair full-crosshair-vertical";
+
+          ch_horizontal.style.top = "" + e.offsetY + "px";
+          ch_vertical.style.left = "" + e.offsetX + "px";
+
+          this.bbox_crosshairs = [ch_horizontal, ch_vertical];
+
+          $(this.leafletHolderEl).append(ch_horizontal);
+          $(this.leafletHolderEl).append(ch_vertical);
+          $(this.leafletHolderEl).on('mousemove', this.bboxCursorUpdate);
+
+        }
       }
     }
 
@@ -435,9 +481,16 @@ export class LeafletAnnotation extends React.Component {
       if(this.state.annotating && !this._drawSuccessfullyCreated){
 				this._currentDrawer.enable();
       }
-
-      if(this.annotating_bbox){
-        this.leafletHolderEl.off('mousemove', this.bboxCursorUpdate);
+      else{
+        // Always turn off the mouse move
+        $(this.leafletHolderEl).off('mousemove', this.bboxCursorUpdate);
+        if(this.bbox_crosshairs != null){
+          let ch_horizontal = this.bbox_crosshairs[0];
+          let ch_vertical = this.bbox_crosshairs[1];
+          $(ch_horizontal).remove();
+          $(ch_vertical).remove();
+          this.bbox_crosshairs = null;
+        }
       }
 
     }
@@ -491,7 +544,7 @@ export class LeafletAnnotation extends React.Component {
         // Initialize the keypoints with default values.
         var keypoints = null;
         var keypoint_layers = null;
-        if(category.keypoints != 'undefined' && category.keypoints.length > 0){
+        if(category.keypoints && category.keypoints.length > 0){
           keypoints = []
           keypoint_layers = []
           for(var j = 0; j < category.keypoints.length; j++){
@@ -519,7 +572,7 @@ export class LeafletAnnotation extends React.Component {
         this.annotation_layers.push(annotation_layer);
 
         // Make a queue of the keypoints to annotate for this new instance.
-        if(this.annotate_keypoints_for_new_instances){
+        if(this.annotate_keypoints_for_new_instances && keypoints != null){
           let annotation_index = this.annotation_layers.length - 1;
           this.annotation_keypoint_queue = [];
           for(var j = 0; j < category.keypoints.length; j++){
@@ -759,6 +812,37 @@ export class LeafletAnnotation extends React.Component {
 
     }
 
+
+    categorySelection(category_idx){
+      $('#categorySelectionModal').modal('hide');
+      this.categorySelectionModalEl = null;
+      this.addNewInstance(category_idx);
+      this.enableHotKeys();
+    }
+
+    categorySelectionCancelled(){
+      $('#categorySelectionModal').modal('hide');
+      this.categorySelectionModalEl = null;
+      this.enableHotKeys();
+    }
+
+    /**
+     *
+     * @param {*} category_idx integer index into our props.categories array
+     */
+    addNewInstance(category_idx){
+      let category = this.props.categories[category_idx];
+
+      // Draw a box
+      this.annotating_bbox=true;
+      this.new_category_id = category.id; // store the category that was selected.
+      this.annotateBBox();
+      this.setState({
+        'annotating' : true,
+      });
+
+    }
+
     /**
      * Allow the user to annotate a new instance with a bbox.
      */
@@ -773,21 +857,24 @@ export class LeafletAnnotation extends React.Component {
       // if there is only one category, then this is real easy.
       var category;
       if (this.props.categories.length == 1){
-        category = this.props.categories[0];
-
-        // Draw a box
-        this.annotating_bbox=true;
-        this.new_category_id = category.id; // store the category that was selected.
-        this.annotateBBox();
-        this.setState({
-          'annotating' : true,
-        });
-
+        this.addNewInstance(0);
       }
       else{
-        // How do we want the user to select the category?
-        // Modal window?
 
+        // Show a modal window and let the user select the category.
+        ReactDOM.render(
+          <CategorySelectionModal ref={(el) => {this.categorySelectionModalEl = el; }} categories={this.props.categories} cancelled={this.categorySelectionCancelled}
+            selected={this.categorySelection}/>,
+          document.getElementById('categorySelectionModalContent')
+        );
+
+        // We don't want hot keys firing when the user is using the filter box
+        this.disableHotKeys();
+
+        // let the modal focus the input
+        $('#categorySelectionModal').off('shown.bs.modal'); // we don't want to keep tacking on events
+        $('#categorySelectionModal').on('shown.bs.modal', ()=>{this.categorySelectionModalEl.shown();});
+        $('#categorySelectionModal').modal('show');
 
       }
 

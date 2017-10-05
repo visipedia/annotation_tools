@@ -15,7 +15,23 @@
     overflow: auto;
     height: 550px;
   }
+
+  #categorySelectionModalCategoryList{
+    max-height: 550px;
+    overflow: auto;
+  }
+
   </style>
+{% endblock %}
+{% block modals %}
+<div>
+  <div class="modal fade" id="categorySelectionModal" data-backdrop="static" tabIndex="-1" role="dialog" aria-labelledby="categorySelectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div id="categorySelectionModalContent" class="modal-content">
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 {% block scripts %}
 {{ super() }}
