@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+{% block title %}BBox Task{% endblock %}
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet/leaflet.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.draw/leaflet.draw.css') }}">
+
+  <style>
+  .leaflet-container{
+      height: 600px;
+      width: 800px;
+  }
+  /* Holds the instances (with the delete buttons)*/
+  #annotationAccordion{
+    overflow: auto;
+    height: 550px;
+  }
+  </style>
+{% endblock %}
+
+<!-- No navbar for this task, waste of space... -->
+{% block navbar %}{% endblock %}
+
+{% block modals %}
+<div>
+  <div class="modal fade" id="bboxTaskHelpModal" tabIndex="-1" role="dialog" aria-labelledby="bboxTaskHelpModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bboxTaskHelpModalLabel">{{ task_instructions['title'] | safe }}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>{{ task_instructions['description'] | safe }}</p>
+          <span>Detailed instructions can be found <a href={{ task_instructions['instructions'] }} target="_blank">here</a>.</span>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div>
+  <div class="modal fade" id="bboxTaskHotKeysModal" tabIndex="-1" role="dialog" aria-labelledby="bboxTaskHotKeysModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bboxTaskHotKeysModalLabel">Hot Keys</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Key</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ESC</td>
+                <td>Exit drawing mode.</td>
+              </tr>
+              <tr>
+                <td>D</td>
+                <td>New box, enter drawing mode.</td>
+              </tr>
+              <tr>
+                <td>H</td>
+                <td>Hide all boxes.</td>
+              </tr>
+              <tr>
+                <td>S</td>
+                <td>Show all boxes.</td>
+              </tr>
+              <tr>
+                <td>SPACE</td>
+                <td>Next image.</td>
+              </tr>
+              <tr>
+                <td>Left Arrow</td>
+                <td>Previous image.</td>
+              </tr>
+              <tr>
+                <td>Right Arrow</td>
+                <td>Next image.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript">
+
+  var taskId = {{ task_id|tojson }};
+  var taskData = {{ task_data|tojson }};
+  var categories = {{ categories|tojson }};
+  var mturk = {{ mturk|tojson }};
+  var taskInstructions = {{ task_instructions|tojson }};
+  document.V.bboxTask(taskId, taskData, categories, mturk, taskInstructions);
+
+</script>
+
+{% endblock %}

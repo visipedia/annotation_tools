@@ -6,7 +6,7 @@ The annotation tools are built on top of [Leaflet.js](http://leafletjs.com/) and
 
 # Requirements
 
-Make sure that you have installed `mongodb`.
+Make sure that you have installed mongodb. We currently develop with node v6.11.0 and Python 2.7.
 
 # Developement setup
 
@@ -110,3 +110,45 @@ python -m annotation_tools.db_dataset_utils --action drop
 # Editing an Image
 
 Use the image id and go to the url `localhost:8008/edit_image/397133`, where the image id is `397133` in this case. Make any modificaiton to the image that you need to and save the annotations. Note that when saving the annotations you directly overwrite the previous version of the annotations.
+
+Note that we currently support editing the class labels, bounding boxes, and keypoints. Editing segmentations is not currently supported.
+
+# Collecting Bounding Boxes
+
+Data format:
+```
+bbox_task_instructions{
+  id : str
+  title : str
+  description : str
+  instructions: url
+  examples: [url]
+}
+
+bbox_task{
+  id : str
+  image_ids : [str]
+  instructions_id : str,
+  category_id : str
+}
+```
+The `bbox_task_instructions` contains the instructions to show to the worker.  The `examples` list should contain urls to example images. These images should have a height of 500px. `instructions` should point to an external page that contains detailed information for your task. For example you can use Google Slides to describe the task in detail and have more examples.
+
+`bbox_task` contains a group of images that comprise a single bounding box task. The task can be accessed by going to the url `localhost:8008/bbox_task/0a95f07a`, where `0a95f07a` is a `bbox_task` `id`.
+
+When a worker finishes a task, the following result structure will be saved in the database:
+```
+bbox_task_result{
+  time : float
+  task_id : str
+  date : str
+  worker_id : str
+  results : [bbox_result]
+}
+
+bbox_result{
+  time : float
+  annotations : [annotation]
+  image : image
+}
+```

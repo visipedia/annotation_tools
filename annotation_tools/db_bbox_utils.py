@@ -19,7 +19,8 @@ A bounding box task dict consists of:
 {
   id : str
   image_ids : [str]
-  instruction_id : str
+  instructions_id : str,
+  category_id : str
 }
 Where image ids point to normal image objects.
 
@@ -67,8 +68,9 @@ def insert_bbox_tasks(db, tasks):
     db: a pymongo database connection
     tasks: [{
       id : task_id,
-      'image_ids' : [image_ids],
-      instructions_id : instructions_id
+      image_ids : [image_ids],
+      instructions_id : instructions_id,
+      category_id : str
     }] A list of bbox task dicts.
   """
   try:
@@ -89,20 +91,18 @@ def insert_bbox_task_instructions(db, task_instructions):
     }] A list of bbox task instructions
   """
   try:
-    response = db.task_instructions.insert_many(task_instructions, ordered=False)
+    response = db.bbox_task_instructions.insert_many(task_instructions, ordered=False)
   except:
     pass
   return response
 
-def create_bbox_tasks_for_all_images(instruction_id, num_images_per_task=20):
+def create_bbox_tasks_for_all_images(db, category_id, instructions_id, num_images_per_task=20):
   """Insert all images into a bounding box task. This is a convenience function.
   Returns:
     [<bbox task dict>] a list of the tasks created.
   """
 
-  db = get_db()
-
-  ensure_indices(db)
+  ensure_bbox_indices(db)
 
   images = list(db.image.find({}, {'id' : True}))
   image_ids = [image['id'] for image in images]
@@ -117,7 +117,8 @@ def create_bbox_tasks_for_all_images(instruction_id, num_images_per_task=20):
     bbox_tasks.append({
       'id' : task_id,
       'image_ids': group,
-      'instruction_id' : instruction_id
+      'instructions_id' : instructions_id,
+      'category_id' : category_id
     })
 
   insert_bbox_tasks(db, bbox_tasks)

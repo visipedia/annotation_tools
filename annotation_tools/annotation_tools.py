@@ -85,3 +85,57 @@ def save_annotations():
   return ""
 
 #################################################
+
+################## BBox Tasks ###################
+
+@app.route('/bbox_task/<task_id>')
+def bbox_task(task_id):
+  """ Get the list of images for a bounding box task and return them along
+  with the instructions for the task to the user.
+  """
+
+  bbox_task = mongo.db.bbox_task.find_one_or_404({'id' : task_id})
+  task_id = str(bbox_task['id'])
+  tasks = []
+  for image_id in bbox_task['image_ids']:
+    image = mongo.db.image.find_one_or_404({'id' : image_id}, projection={'_id' : False})
+    tasks.append({
+      'image' : image,
+      'annotations' : []
+    })
+
+  print("here 1")
+
+  category_id = bbox_task['category_id']
+  categories = [mongo.db.category.find_one_or_404({'id' : category_id}, projection={'_id' : False})]
+  #categories = json.loads(json_util.dumps(categories))
+
+  print("here 2")
+
+  task_instructions_id = bbox_task['instructions_id']
+  task_instructions = mongo.db.bbox_task_instructions.find_one_or_404({'id' : task_instructions_id}, projection={'_id' : False})
+
+  print("here 3")
+
+  return render_template('bbox_task.html',
+    task_id=task_id,
+    task_data=tasks,
+    categories=categories,
+    mturk=True,
+    task_instructions=task_instructions
+  )
+
+@app.route('/bbox_task/save', methods=['POST'])
+def bbox_task_save():
+  """ Save the results of a bounding box task.
+  """
+
+  task_result = json_util.loads(json.dumps(request.json))
+
+  task_result['date'] = str(datetime.datetime.now())
+
+  insert_res = mongo.db.bbox_task_result.insert_one(task_result, bypass_document_validation=True)
+
+  return ""
+
+#################################################
