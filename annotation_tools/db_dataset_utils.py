@@ -51,8 +51,6 @@ from __future__ import print_function
 import argparse
 import json
 
-import pymongo
-
 from annotation_tools.annotation_tools import get_db
 from annotation_tools.utils import COLOR_LIST
 
