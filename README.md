@@ -1,8 +1,22 @@
 # Visipedia Annotation Toolkit
 
-This repository contains a collection of tools for editing and creating COCO style datasets. This repo is a work in progress, you have been warned.
+This repository contains a collection of tools for editing and creating [COCO style datasets](http://cocodataset.org/#download). This repo is a work in progress.
 
 The annotation tools are built on top of [Leaflet.js](http://leafletjs.com/) and [Leaflet.draw](https://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html).
+
+# Capabilities:
+* Load and visualize a COCO style dataset
+* Edit Class Labels
+* Edit Bounding Boxes
+* Edit Keypoints
+* Export a COCO style dataet
+* Bounding Box Tasks for Amazon Mechanical Turk
+
+# Not Implemented:
+* Edit Segmentations
+* Keypoint tasks for Amazon Mechanical Turk
+* Class label tasks for Amazon Mechanical Turk
+* Segmentation tasks for Amazon Mechanical Turk
 
 # Requirements
 
@@ -35,6 +49,13 @@ $ python run.py \
 # Dataset Format
 We use a slightly modified COCO dataset format:
 ```
+{
+"images" : [image], 
+"annotations" : [annotation],
+"categories" : [category],
+"licenses" : [license]
+}
+
 image{
   "id" : str,
   "width" : int,
@@ -86,7 +107,7 @@ The biggest change that we have made is storing the annotations in normalized co
 
 We use the modified COCO dataset format as the "schema" for the the MongoDB database. Loading a dataset will create 4 collections: `category`, `image`, `annotation`, and `license`.
 
-We can load the original COCO dataset out of the box. However, the annotations should be normalized and a proper url field will be added.
+We can load the original COCO dataset out of the box. However, we need to tell the code to normalize the annotations by passing the `--normalize` command line argument. Further, the code will check to see is `coco_url` is present and will create a `url` field with the same value. 
 
 Load a dataset:
 ```
@@ -95,6 +116,8 @@ python -m annotation_tools.db_dataset_utils --action load \
 --normalize
 ```
 
+After we have edited the dataset, we can export it. This will produce a json file that can be used as a datatset file to train a computer vision model. By default, the code will export *noramalized* annotations, we can export denomalized coordinates by passing the `--denormalize` command line argument. 
+
 Export a dataset:
 ```
 python -m annotation_tools.db_dataset_utils --action export \
@@ -102,21 +125,28 @@ python -m annotation_tools.db_dataset_utils --action export \
 --denormalize
 ```
 
-Clear the database:
+We provide a convenience function to clear the collections that have been created when loading a dataset:
 ```
 python -m annotation_tools.db_dataset_utils --action drop
 ```
 
 # Editing an Image
 
-Use the image id and go to the url `localhost:8008/edit_image/397133`, where the image id is `397133` in this case. Make any modificaiton to the image that you need to and save the annotations. Note that when saving the annotations you directly overwrite the previous version of the annotations.
+This tool is meant to be used by a "super user." It is a convenient tool to visualize and edit all annotations on an image. All changes will overwrite the annotations in the database. To edit a specific image, use the image id (which you specified in the dataset file that you loaded in the previous section) and go to the url `localhost:8008/edit_image/397133`, where the image id is `397133` in this case. Make any modificaiton to the image that you need to and save the annotations. Note that when saving the annotations you directly overwrite the previous version of the annotations.
 
-Note that we currently support editing the class labels, bounding boxes, and keypoints. Editing segmentations is not currently supported.
+We currently support editing the class labels, bounding boxes, and keypoints. Editing segmentations is not currently supported.
 
 # Collecting Bounding Boxes
 
+We support creating bounding box tasks, where each task is composed of a group of images that needed to be annotated with bounding boxes for a *single* category. Each task has a specific `id` and is accessible via `localhost:8008/bbox_task/0a95f07a`, where `0a95f07a` is the task id. Similar to datasets, you'll need to create a json file that specifies the bounding box tasks and then load that file into the tool. 
+
 Data format:
 ```
+{
+  'instructions' : [bbox_task_instructions],
+  'tasks' : [bbox_task]
+}
+
 bbox_task_instructions{
   id : str
   title : str
@@ -132,9 +162,16 @@ bbox_task{
   category_id : str
 }
 ```
-The `bbox_task_instructions` contains the instructions to show to the worker.  The `examples` list should contain urls to example images. These images should have a height of 500px. `instructions` should point to an external page that contains detailed information for your task. For example you can use Google Slides to describe the task in detail and have more examples.
+The `bbox_task_instructions` contains fields that hold instruction information to show to the worker.  The `examples` list should contain urls to example images. These images should have a height of 500px and will be rendered on the task start screen. `instructions` should point to an external page that contains detailed information for your task. For example you can use Google Slides to describe the task in detail and have more examples. 
 
-`bbox_task` contains a group of images that comprise a single bounding box task. The task can be accessed by going to the url `localhost:8008/bbox_task/0a95f07a`, where `0a95f07a` is a `bbox_task` `id`.
+`bbox_task` contains a list of image ids (`image_ids`) that should be annotated with bounding boxes. The `instruction_id` field should be a valid bbox_task_instructions `id`. The `category_id` should be valid category that was created when loading a dataset. The workers will be asked to draw boxes around that category for each image in the task.
+
+Once you have created a json file you can load it:
+
+
+The task can be accessed by going to the url `localhost:8008/bbox_task/0a95f07a`, where `0a95f07a` is a `bbox_task` `id`.
+
+ 
 
 When a worker finishes a task, the following result structure will be saved in the database:
 ```
@@ -152,3 +189,5 @@ bbox_result{
   image : image
 }
 ```
+
+These
