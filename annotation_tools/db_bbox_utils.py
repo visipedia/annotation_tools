@@ -137,7 +137,7 @@ def load_tasks(db, task_data):
   if 'instructions' in task_data:
     instructions = task_data['instructions']
     print("Inserting %d instructions." % (len(instructions),))
-    response = insert_bbox_task_instructions(db, task_instructions)
+    response = insert_bbox_task_instructions(db, instructions)
     print("Successfully inserted %d instuctions." % (len(response.inserted_ids),))
 
   tasks = task_data['tasks']
@@ -160,13 +160,13 @@ def export_task_results(db, task_data=None, denormalize=False):
 
   if denormalize:
     for task_result in task_results:
-      for image_result in task_result:
+      for image_result in task_result['results']:
         image = image_result['image']
         width = image['width']
         height = image['height']
         for anno in image_result['annotations']:
           x, y, w, h = anno['bbox']
-          anno['bbox'] = [x * image_width, y * image_height, w * image_width, h * image_height]
+          anno['bbox'] = [x * width, y * height, w * width, h * height]
 
   return task_results
 
@@ -211,9 +211,9 @@ def main():
         task_data = json.load(f)
     else:
       task_data = None
-    results = export_tasks(db, task_data, denormalize=args.denormalize)
+    results = export_task_results(db, task_data, denormalize=args.denormalize)
     with open(args.output_path, 'w') as f:
-      json.dump(dataset, f)
+      json.dump(results, f)
 
 if __name__ == '__main__':
 
