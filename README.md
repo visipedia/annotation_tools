@@ -4,7 +4,7 @@ This repository contains a collection of tools for editing and creating [COCO st
 
 The annotation tools are built on top of [Leaflet.js](http://leafletjs.com/) and [Leaflet.draw](https://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html).
 
-# Capabilities:
+## Capabilities:
 * Load and visualize a COCO style dataset
 * Edit Class Labels
 * Edit Bounding Boxes
@@ -12,7 +12,7 @@ The annotation tools are built on top of [Leaflet.js](http://leafletjs.com/) and
 * Export a COCO style dataet
 * Bounding Box Tasks for Amazon Mechanical Turk
 
-# Not Implemented:
+## Not Implemented:
 * Edit Segmentations
 * Keypoint tasks for Amazon Mechanical Turk
 * Class label tasks for Amazon Mechanical Turk
@@ -97,7 +97,7 @@ license{
 
 The biggest change that we have made is storing the annotations in normalized coordinates (each x value is divided by the width of the image, and each y value is divided by the height of the image). This is more convenient for rendering the annotations on resized images. We also use strings to store the ids rather than integers.
 
-`coco_url` / `flickr_url` has been remapped to `url`.
+`coco_url` & `flickr_url` have been remapped to `url`.
 
 `rights_holder` is a string that can hold the photographer's name.
 
@@ -107,7 +107,7 @@ The biggest change that we have made is storing the annotations in normalized co
 
 We use the modified COCO dataset format as the "schema" for the the MongoDB database. Loading a dataset will create 4 collections: `category`, `image`, `annotation`, and `license`.
 
-We can load the original COCO dataset out of the box. However, we need to tell the code to normalize the annotations by passing the `--normalize` command line argument. Further, the code will check to see is `coco_url` is present and will create a `url` field with the same value.
+We can load the original COCO dataset out of the box. However, we need to tell the code to normalize the annotations by passing the `--normalize` command line argument. Further, the code will check to see if `coco_url` is present and will create a `url` field with the same value.
 
 Load a dataset:
 ```
@@ -181,7 +181,7 @@ python -m annotation_tools.db_bbox_utils --action load \
 --tasks ~/Desktop/bbox_tasks.json
 ```
 
-The task can be accessed by going to the url `localhost:8008/bbox_task/0a95f07a`, where `0a95f07a` is a `bbox_task` `id` that you specified when in the json file that was loaded.
+The task can be accessed by going to the url `localhost:8008/bbox_task/0a95f07a`, where `0a95f07a` is a `bbox_task` `id` that you specified in the json file that was loaded.
 
 When a worker finishes a task, the following result structure will be saved in the database:
 ```
@@ -199,6 +199,7 @@ bbox_result{
   image : image
 }
 ```
+Where `annotation` is defined above. 
 
 These results can be exported to a json file with:
 ```
