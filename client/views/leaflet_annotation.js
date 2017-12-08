@@ -506,11 +506,13 @@ export class LeafletAnnotation extends React.Component {
       //		doing a single click for a bounding box, etc.
       this._drawSuccessfullyCreated = true;
 
-      let layer = e.layer;
-      this.addLayer(layer);
+      var layer = e.layer;
+
 
       // Were we annotating a keypoint?
       if(this.annotating_keypoint){
+
+        this.addLayer(layer);
 
         // Save off the layer
         this.annotation_layers[this.current_annotationIndex]['keypoints'][this.current_keypointIndex] = layer;
@@ -537,6 +539,10 @@ export class LeafletAnnotation extends React.Component {
 
       }
       else if(this.annotating_bbox){
+
+        // We want to clamp the box to the image bounds.
+        layer = this.restrictBoxLayerToImage(layer);
+        this.addLayer(layer);
 
         // This is a new instance. Grab the category that was chosen by the user for the new instance.
         let category = this.categoryMap[this.new_category_id];
@@ -981,6 +987,41 @@ export class LeafletAnnotation extends React.Component {
     }
 
     /**
+     * Restrict the box to the image bounds.
+     * @param {*} layer
+     */
+    restrictBoxLayerToImage(layer){
+      var bounds = layer.getBounds();
+      var point1 = this.leafletMap.project(bounds.getNorthWest(), 0);
+      var point2 = this.leafletMap.project(bounds.getSouthEast(), 0);
+
+      var x1 = point1.x;
+      var y1 = point1.y;
+      var x2 = point2.x;
+      var y2 = point2.y;
+
+      [x1, y1] = this._restrictPointToImageBounds(x1, y1);
+      [x2, y2] = this._restrictPointToImageBounds(x2, y2);
+
+      // Is one of the deminsions 0?
+      var valid=true;
+      if(x2 - x1 <= 0){
+        return null;
+      }
+      else if(y2 - y1 <= 0){
+        return null;
+      }
+
+      point1 = L.point(x1, y1);
+      point1 = this.leafletMap.unproject(point1, 0);
+      point2 = L.point(x2, y2);
+      point2 = this.leafletMap.unproject(point2, 0);
+
+      bounds = [point1, point2];
+      return L.rectangle(bounds, layer.options);
+    }
+
+    /**
      * Extract a bbox annotation from a bbox layer
      * @param {*} layer
      */
@@ -1040,7 +1081,7 @@ export class LeafletAnnotation extends React.Component {
       if (y > this.imageHeight){
         y = this.imageHeight;
       }
-      else if(x < 0){
+      else if(y < 0){
         y = 0;
       }
 
