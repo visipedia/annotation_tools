@@ -51,8 +51,12 @@ from __future__ import print_function
 import argparse
 import json
 
+from pymongo.errors import BulkWriteError
+
 from annotation_tools.annotation_tools import get_db
 from annotation_tools.utils import COLOR_LIST
+
+DUPLICATE_KEY_ERROR_CODE = 11000
 
 def drop_dataset(db):
   """ Drop the collections.
@@ -103,10 +107,14 @@ def load_dataset(db, dataset, normalize=False):
 
     try:
       response = db.category.insert_many(categories, ordered=False)
-    except:
-      pass
+      print("Successfully inserted %d categories" % (len(response.inserted_ids),))
+    except BulkWriteError as bwe:
+      panic = filter(lambda x: x['code'] != DUPLICATE_KEY_ERROR_CODE, bwe.details['writeErrors'])
+      if len(panic) > 0:
+        raise
+      print("Attempted to insert duplicate categories, %d new categories inserted" % (bwe.details['nInserted'],))
 
-    print("Successfully inserted %d categories" % (len(response.inserted_ids),))
+
 
   # Insert the images
   assert 'images' in dataset, "Failed to find `images` in dataset object."
@@ -129,10 +137,14 @@ def load_dataset(db, dataset, normalize=False):
 
     try:
       response = db.image.insert_many(images, ordered=False)
-    except:
-      pass
+      print("Successfully inserted %d images" % (len(response.inserted_ids),))
 
-    print("Successfully inserted %d images" % (len(response.inserted_ids),))
+    except BulkWriteError as bwe:
+      panic = filter(lambda x: x['code'] != DUPLICATE_KEY_ERROR_CODE, bwe.details['writeErrors'])
+      if len(panic) > 0:
+        raise
+      print("Attempted to insert duplicate images, %d new images inserted" % (bwe.details['nInserted'],))
+
 
   # Insert the annotations
   assert 'annotations' in dataset, "Failed to find `annotations` in dataset object."
@@ -161,10 +173,14 @@ def load_dataset(db, dataset, normalize=False):
 
     try:
       response = db.annotation.insert_many(annotations, ordered=False)
-    except:
-      pass
+      print("Successfully inserted %d annotations" % (len(response.inserted_ids),))
+    except BulkWriteError as bwe:
+      panic = filter(lambda x: x['code'] != DUPLICATE_KEY_ERROR_CODE, bwe.details['writeErrors'])
+      if len(panic) > 0:
+        raise
+      print("Attempted to insert duplicate annotations, %d new annotations inserted" % (bwe.details['nInserted'],))
 
-    print("Successfully inserted %d annotations" % (len(response.inserted_ids),))
+
 
   # Insert the licenses
   assert 'licenses' in dataset, "Failed to find `licenses` in dataset object."
@@ -178,10 +194,13 @@ def load_dataset(db, dataset, normalize=False):
 
     try:
       response = db.license.insert_many(licenses, ordered=False)
-    except:
-      pass
+      print("Successfully inserted %d licenses" % (len(response.inserted_ids),))
+    except BulkWriteError as bwe:
+      panic = filter(lambda x: x['code'] != DUPLICATE_KEY_ERROR_CODE, bwe.details['writeErrors'])
+      if len(panic) > 0:
+        raise
+      print("Attempted to insert duplicate licenses, %d new licenses inserted" % (bwe.details['nInserted'],))
 
-    print("Successfully inserted %d licenses" % (len(response.inserted_ids),))
 
 def export_dataset(db, denormalize=False):
 
