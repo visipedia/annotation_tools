@@ -1089,12 +1089,7 @@ export class LeafletAnnotation extends React.Component {
 
     }
 
-    /**
-     * Extract the current state of the annotations and send them to our parent view.
-     * The current positions of the bboxes and keypoints are extracted from their
-     * corresponding layer.
-     */
-    handleSave(){
+    getAnnotations(){
 
       let annotations = this.state.annotations;
       var annotations_to_save = [];
@@ -1153,8 +1148,26 @@ export class LeafletAnnotation extends React.Component {
         }
         annotations_to_save.push(new_annotation);
       }
+      return annotations_to_save;
+    }
 
-      this.props.onSave(annotations_to_save);
+    getState(){
+      let state = {
+        'annotations' : this.getAnnotations(),
+        'image' : this.props.image
+      }
+      return state;
+    }
+
+    /**
+     * Extract the current state of the annotations and send them to our parent view.
+     * The current positions of the bboxes and keypoints are extracted from their
+     * corresponding layer.
+     */
+    handleSave(){
+
+      //this.props.onSave(annotations_to_save);
+      this.props.onSave(()=>{}, ()=>{});
 
     }
 

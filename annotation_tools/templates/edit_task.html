@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block title %}BBox Task{% endblock %}
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet/leaflet.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.draw/leaflet.draw.css') }}">
+
+  <style>
+  .leaflet-container{
+      height: 600px;
+      width: 700px;
+  }
+  /* Holds the instances (with the delete buttons)*/
+  #annotationAccordion{
+    overflow: auto;
+    height: 550px;
+  }
+  </style>
+{% endblock %}
+
+<!-- No navbar for this task, waste of space... -->
+{% block navbar %}{% endblock %}
+
+{% block modals %}
+<div>
+  <div class="modal fade" id="categorySelectionModal" data-backdrop="static" tabIndex="-1" role="dialog" aria-labelledby="categorySelectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div id="categorySelectionModalContent" class="modal-content">
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript">
+
+  var taskId = {{ task_id|tojson }};
+  var imageIds = {{ image_ids|tojson }};
+  var categories = {{ categories|tojson }};
+  document.V.editTask(taskId, imageIds, categories);
+
+</script>
+
+{% endblock %}

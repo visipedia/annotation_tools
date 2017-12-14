@@ -17,38 +17,52 @@ export class FullEditView extends React.Component {
 
         this.handleImageLoaded = this.handleImageLoaded.bind(this);
         this.handleImageFailed = this.handleImageFailed.bind(this);
-        this.saveAnnotations = this.saveAnnotations.bind(this);
+        //this.saveAnnotations = this.saveAnnotations.bind(this);
     }
 
-    handleImageLoaded(imageElement) {
-        this.setState({
-            imageElement: imageElement
-        });
-    }
+  handleImageLoaded(imageElement) {
+    this.setState({
+      imageElement: imageElement
+    });
+  }
 
-    handleImageFailed(){
-        console.log('Image failed to load');
-    }
+  handleImageFailed(){
+    console.log('Image failed to load');
+  }
 
-    performSave(){
-      if(this.leafletImage != 'undefined' && this.leafletImage != null){
-        this.leafletImage.handleSave();
-      }
-    }
+  performSave(onSuccess, onFail){
+    if(this.leafletImage != 'undefined' && this.leafletImage != null){
+      let imageData = this.leafletImage.getState();
 
-    saveAnnotations(annotations){
       console.log("saving annotations");
       $.ajax({
         url : "/annotations/save",
         method : 'POST',
-        data : JSON.stringify({'annotations' : annotations}),
+        data : JSON.stringify({'annotations' : imageData.annotations}),
         contentType: 'application/json'
       }).done(function(){
         console.log("saved annotations");
+        onSuccess();
       }).fail(function(){
-
+        onFail();
       });
+
     }
+  }
+
+    // saveAnnotations(annotations){
+    //   console.log("saving annotations");
+    //   $.ajax({
+    //     url : "/annotations/save",
+    //     method : 'POST',
+    //     data : JSON.stringify({'annotations' : annotations}),
+    //     contentType: 'application/json'
+    //   }).done(function(){
+    //     console.log("saved annotations");
+    //   }).fail(function(){
+
+    //   });
+    // }
 
   render() {
 
@@ -70,7 +84,7 @@ export class FullEditView extends React.Component {
                             annotations={this.props.annotations}
                             categories={this.props.categories}
                             enableEditing={true}
-                            onSave={this.saveAnnotations}/>
+                            onSave={this.performSave}/>
             </div>
           </div>
         </div>

@@ -57,6 +57,32 @@ def edit_image(image_id):
     # Render a webpage to edit the annotations for this image
     return render_template('edit_image.html', image=image, annotations=annotations, categories=categories)
 
+@app.route('/edit_task/')
+def edit_task():
+  """ Edit a group of images.
+  """
+  start=0
+  if 'start' in request.args:
+    start = int(request.args['start'])
+  end=None
+  if 'end' in request.args:
+    end = int(request.args['end'])
+
+  images = list(mongo.db.image.find(projection={'id' : True, '_id' : False}))
+  if end is None:
+    images = images[start:]
+  else:
+    images = images[start:end]
+  image_ids = [image['id'] for image in images]
+
+  categories = list(mongo.db.category.find(projection={'_id' : False}))
+
+  return render_template('edit_task.html',
+    task_id=1,
+    image_ids=image_ids,
+    categories=categories,
+  )
+
 @app.route('/annotations/save', methods=['POST'])
 def save_annotations():
   """ Save the annotations. This will overwrite annotations.
@@ -104,18 +130,12 @@ def bbox_task(task_id):
       'annotations' : []
     })
 
-  print("here 1")
-
   category_id = bbox_task['category_id']
   categories = [mongo.db.category.find_one_or_404({'id' : category_id}, projection={'_id' : False})]
   #categories = json.loads(json_util.dumps(categories))
 
-  print("here 2")
-
   task_instructions_id = bbox_task['instructions_id']
   task_instructions = mongo.db.bbox_task_instructions.find_one_or_404({'id' : task_instructions_id}, projection={'_id' : False})
-
-  print("here 3")
 
   return render_template('bbox_task.html',
     task_id=task_id,
