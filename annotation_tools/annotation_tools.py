@@ -68,12 +68,22 @@ def edit_task():
   if 'end' in request.args:
     end = int(request.args['end'])
 
-  images = list(mongo.db.image.find(projection={'id' : True, '_id' : False}))
-  if end is None:
-    images = images[start:]
+  # Find annotations and their accompanying images for this category
+  if 'category_id' in request.args:
+    category_id = request.args['category_id']
+    annos = mongo.db.annotation.find({ "category_id" : category_id}, projection={'image_id' : True, '_id' : False})#.sort([('image_id', 1)])
+    image_ids = list(set([anno['image_id'] for anno in annos]))
+    image_ids.sort()
+
+  # Else just grab all of the images.
   else:
-    images = images[start:end]
-  image_ids = [image['id'] for image in images]
+    images = mongo.db.image.find(projection={'id' : True, '_id' : False}).sort([('id', 1)])
+    image_ids = [image['id'] for image in images]
+
+  if end is None:
+    image_ids = image_ids[start:]
+  else:
+    image_ids = image_ids[start:end]
 
   categories = list(mongo.db.category.find(projection={'_id' : False}))
 
