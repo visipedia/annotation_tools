@@ -295,11 +295,11 @@ export class BBoxAnnotation extends React.Component {
         let color = COLORS[annotationIndex % COLORS.length];
         let pathStyle = this.createBBoxPathStyle(color)
 
-        var [x1, y1, x2, y2] = annotation.bbox;
+        var [x1, y1, w, h] = annotation.bbox;
         x1 = x1 * imageWidth;
         y1 = y1 * imageHeight;
-        x2 = x2 * imageWidth;
-        y2 = y2 * imageHeight;
+        x2 = x1 + w * imageWidth;
+        y2 = y2 + h * imageHeight;
         let bounds = L.latLngBounds(this.leafletMap.unproject([x1, y1], 0), this.leafletMap.unproject([x2, y2], 0));
         let layer = L.rectangle(bounds, pathStyle);
 
@@ -709,12 +709,12 @@ export class BBoxAnnotation extends React.Component {
       [x1, y1] = this._restrictPointToImageBounds(x1, y1);
       [x2, y2] = this._restrictPointToImageBounds(x2, y2);
 
-      x1 = x1 / this.imageWidth;
-      y1 = y1 / this.imageHeight;
-      x2 = x2 / this.imageWidth;
-      y2 = y2 / this.imageHeight;
+      let x = x1 / this.imageWidth;
+      let y = y1 / this.imageHeight;
+      let w = (x2 - x1) / this.imageWidth;
+      let h = (y2 - y1) / this.imageHeight;
 
-      return [x1, y1, x2, y2];
+      return [x, y, w, h];
 
     }
 

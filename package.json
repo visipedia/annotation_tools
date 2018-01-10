@@ -27,6 +27,7 @@
     "bootstrap": "^4.0.0-beta",
     "jquery": "^3.2.1",
     "leaflet": "^1.2.0",
+    "npm": "^5.6.0",
     "popper.js": "^1.12.5",
     "react": "^16.0.0",
     "react-dom": "^16.0.0"
