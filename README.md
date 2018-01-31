@@ -59,9 +59,9 @@ $ python -m annotation_tools.db_dataset_utils --action load \
 
 Go to `http://localhost:8008/edit_image/100238` to edit the annotations for the validation image with `id=100238`. 
 
-Go to `http://localhost:8000/edit_task/?start=0&end=100` to edit the first 100 images, where the images have been sorted by their ids. 
+Go to `http://localhost:8008/edit_task/?start=0&end=100` to edit the first 100 images, where the images have been sorted by their ids. 
 
-Go to `http://localhost:8000/edit_task/?category_id=1` to edit all images that have annotations whose `category_id=1`.
+Go to `http://localhost:8008/edit_task/?category_id=1` to edit all images that have annotations whose `category_id=1`.
 
 Export the modified dataset:
 ```
