@@ -148,6 +148,7 @@ Now we can load in the dataset file that we created:
 python -m annotation_tools.db_dataset_utils --action load \
 --dataset /home/ubuntu/mouse_dataset.json
 ```
+If you get an error regarding connection problems, then please make sure you installed MongoDB and have it running (e.g. see [here](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#install-mongodb-community-edition-on-ubuntu) for Ubuntu 16.04)
 
 ## Edit a Specific Image
 To edit a specific image, use the image id to construct the edit url `http://localhost:8008/edit_image/image0`. Opening that url will allow you to add annotations to the image.
