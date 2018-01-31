@@ -1,4 +1,6 @@
-# Tutorial
+# Mice Tutorial
+
+![interface with mice](assets/mice_tutorial.png?raw=true)
 
 ## Setup
 The annotation tools rely on [MongoDB](https://www.mongodb.com/) as a database, so you'll need to install that on your machine. Follow the tutorials [here](https://docs.mongodb.com/manual/installation/#tutorials) to install the database. Once installed, make sure that MongoDB is running (i.e. run the `mongod` command).
