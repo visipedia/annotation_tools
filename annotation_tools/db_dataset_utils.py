@@ -125,7 +125,7 @@ def load_dataset(db, dataset, normalize=False):
     # Ensure that the image ids and license ids are strings
     for image in images:
       image['id'] = str(image['id'])
-      image['license'] = str(image['license'])
+      image['license'] = str(image['license']) if 'license' in image else ''
 
       # If loading the actual COCO dataset, then remap `coco_url` to `url`
       if 'url' not in image and 'coco_url' in image:
