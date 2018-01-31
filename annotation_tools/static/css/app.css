@@ -2,8 +2,12 @@
 .circle-marker{
   border-radius: 50%;
   box-shadow: 0 0 0 2px #000000;
-  height: 12px;
-  width: 12px;
+
+  /* Override leaflet-marker stuff */
+  height: 10px !important;
+  width: 10px !important;
+  margin-left: -5px !important;
+  margin-top: -5px !important;
 }
 
 .keypoint-visibility-desc{
