@@ -1,3 +1,5 @@
+![coco example](tutorials/assets/coco_example.png?raw=true)
+
 # Visipedia Annotation Toolkit
 
 This repository contains a collection of tools for editing and creating [COCO style datasets](http://cocodataset.org/#download).
@@ -19,12 +21,12 @@ These web based annotation tools are built on top of [Leaflet.js](http://leaflet
 * Segmentation tasks for Amazon Mechanical Turk
 
 # Requirements and Environments
-This code base is developed using Python 2.7.10 on Ubuntu 16.04 and MacOSX 10.11. You need to have [MongoDB](https://www.mongodb.com/) [installed](https://docs.mongodb.com/manual/installation/#tutorials) and [running](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/#run-mongodb). 
+This code base is developed using Python 2.7.10 on Ubuntu 16.04 and MacOSX 10.11. You need to have [MongoDB](https://www.mongodb.com/) [installed](https://docs.mongodb.com/manual/installation/#tutorials) and [running](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/#run-mongodb).
 
-The tools are primarily tested using the [Chrome web browser](https://www.google.com/chrome/browser/desktop/index.html). 
+The tools are primarily tested using the [Chrome web browser](https://www.google.com/chrome/browser/desktop/index.html).
 
 # Quick Start
-Make sure that MongoDB is installed and running (e.g. for Ubuntu 16.04 see [here](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#import-the-public-key-used-by-the-package-management-system)). 
+Make sure that MongoDB is installed and running (e.g. for Ubuntu 16.04 see [here](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#import-the-public-key-used-by-the-package-management-system)).
 
 Clone the repo:
 ```
@@ -58,9 +60,9 @@ $ python -m annotation_tools.db_dataset_utils --action load \
 ```
 If you get an error here, then please make sure MongoDB is installed and running.
 
-Go to `http://localhost:8008/edit_image/100238` to edit the annotations for the validation image with `id=100238`. 
+Go to `http://localhost:8008/edit_image/100238` to edit the annotations for the validation image with `id=100238`.
 
-Go to `http://localhost:8008/edit_task/?start=0&end=100` to edit the first 100 images, where the images have been sorted by their ids. 
+Go to `http://localhost:8008/edit_task/?start=0&end=100` to edit the first 100 images, where the images have been sorted by their ids.
 
 Go to `http://localhost:8008/edit_task/?category_id=1` to edit all images that have annotations whose `category_id=1`.
 
@@ -77,7 +79,7 @@ $ python -m annotation_tools.db_dataset_utils --action drop
 ```
 
 # Developement Setup
-To modify and develop this code base you will need to have [node](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) installed. 
+To modify and develop this code base you will need to have [node](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) installed.
 
 Clone the repo:
 ```
@@ -264,7 +266,7 @@ bbox_result{
   image : image
 }
 ```
-Where `annotation` is defined above. 
+Where `annotation` is defined above.
 
 These results can be exported to a json file with:
 ```
