@@ -75,7 +75,7 @@ categories = [{
 We've created two categories, one for the black mouse and one for the white mouse. We've specified the same keypoints and keypoint styles for each category.
 
 We'll presume that the user has a directory of images that they want to annotate. We want to create the following structure for each image:
-
+```
 image{
   "id" : str,
   "width" : int,
@@ -86,7 +86,7 @@ image{
   "url" : str,
   "date_captured" : datetime (str)
 }
-
+```
 We can leave many of these fields blank, but at the very least we need to specify the image `id` and the `url`. The annotation tool is web based, hence the need for an image *url*. However, we are working with a directory of images stored on the user's local machine, so how do we create a url? We'll start a webserver and serve the images locally using python's `SimpleHTTPServer`. We'll start the server in the image directory, so an image's url will look like `http://localhost:6008/image0.jpg` (assuming that the server is listening on port 6008). We'll use the following the python code to read the images in the directory and create the image structures:
 ```python
 
