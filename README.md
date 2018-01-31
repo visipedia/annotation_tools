@@ -1,8 +1,8 @@
 # Visipedia Annotation Toolkit
 
-This repository contains a collection of tools for editing and creating [COCO style datasets](http://cocodataset.org/#download). This repo is a work in progress.
+This repository contains a collection of tools for editing and creating [COCO style datasets](http://cocodataset.org/#download).
 
-The annotation tools are built on top of [Leaflet.js](http://leafletjs.com/) and [Leaflet.draw](https://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html).
+These web based annotation tools are built on top of [Leaflet.js](http://leafletjs.com/) and [Leaflet.draw](https://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html).
 
 ## Capabilities:
 * Load and visualize a COCO style dataset
@@ -18,11 +18,71 @@ The annotation tools are built on top of [Leaflet.js](http://leafletjs.com/) and
 * Class label tasks for Amazon Mechanical Turk
 * Segmentation tasks for Amazon Mechanical Turk
 
-# Requirements
+# Requirements and Environments
+This code base is developed using Python 2.7.10 on Ubuntu 16.04 and MacOSX 10.11. You need to have [MongoDB](https://www.mongodb.com/) [installed](https://docs.mongodb.com/manual/installation/#tutorials) and [running](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/#run-mongodb). 
 
-Make sure that you have installed mongodb. We currently develop with node v6.11.0 and Python 2.7.
+The tools are primarily tested using the [Chrome web browser](https://www.google.com/chrome/browser/desktop/index.html). 
 
-# Developement setup
+# Quick Start
+Make sure that MongoDB is running. 
+
+Clone the repo:
+```
+$ git clone https://github.com/visipedia/annotation_tools.git
+$ cd annotation_tools
+```
+
+Install the python dependencies:
+```
+$ pip install -r requirements.txt
+```
+
+Start the annotation tool web server
+```
+$ python run.py --port 8008
+```
+
+Download the COCO Dataset annotation file:
+```
+cd ~/Downloads
+wget http://images.cocodataset.org/annotations/annotations_trainval2017.zip
+unzip annotations_trainval2017.zip
+```
+
+Import the validation annotations into the annotation tool:
+```
+# From the annotation_tools repo
+$ python -m annotation_tools.db_dataset_utils --action load \
+--dataset ~/Downloads/annotations/person_keypoints_val2017.json \
+--normalize
+```
+
+Go to `http://localhost:8008/edit_image/100238` to edit the annotations for the validation image with `id=100238`. 
+
+Go to `http://localhost:8000/edit_task/?start=0&end=100` to edit the first 100 images, where the images have been sorted by their ids. 
+
+Go to `http://localhost:8000/edit_task/?category_id=1` to edit all images that have annotations whose `category_id=1`.
+
+Export the modified dataset:
+```
+$ python -m annotation_tools.db_dataset_utils --action export \
+--output ~/Downloads/annotations/updated_person_keypoints_val2017.json \
+--denormalize
+```
+
+Clear the annotation tool database:
+```
+$ python -m annotation_tools.db_dataset_utils --action drop
+```
+
+# Developement Setup
+To modify and develop this code base you will need to have [node](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) installed. 
+
+Clone the repo:
+```
+$ git clone https://github.com/visipedia/annotation_tools.git
+$ cd annotation_tools
+```
 
 Install python packages:
 ```
@@ -144,6 +204,10 @@ This starts a webserver on port 8007 that can serve files from the `/home/gvanho
 The edit tool is meant to be used by a "super user." It is a convenient tool to visualize and edit all annotations on an image. All changes will overwrite the annotations in the database. To edit a specific image, use the image id (which you specified in the dataset file that you loaded in the previous section) and go to the url `localhost:8008/edit_image/397133`, where the image id is `397133` in this case. Make any modificaiton to the image that you need to and save the annotations. Note that when saving the annotations you directly overwrite the previous version of the annotations.
 
 We currently support editing the class labels, bounding boxes, and keypoints. Editing segmentations is not currently supported.
+
+# Editing an Image Sequence
+
+You can use a url constucted like `localhost:8008/edit_task/?start=0&end=100` to edit the first 100 images in the dataset, where the images are sorted by their ids. You can additionally specify a category id to edit only images that have labels with that category `localhost:8008/edit_task/?start=0&end=100&category_id=1`.
 
 # Collecting Bounding Boxes
 
