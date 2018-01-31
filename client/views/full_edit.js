@@ -17,6 +17,7 @@ export class FullEditView extends React.Component {
 
         this.handleImageLoaded = this.handleImageLoaded.bind(this);
         this.handleImageFailed = this.handleImageFailed.bind(this);
+        this.performSave = this.performSave.bind(this);
         //this.saveAnnotations = this.saveAnnotations.bind(this);
     }
 

@@ -111,12 +111,18 @@ def save_annotations():
         pass # this annotation was created and then deleted.
       else:
         # This is a new annotation
-        if 'id' not in annotation:
-          insert_res = mongo.db.annotation.insert_one(annotation, bypass_document_validation=True)
-          anno_id = insert_res.inserted_id
-          mongo.db.annotation.update_one({'_id' : anno_id}, {'$set' : {'id' : str(anno_id)}})
-        else:
-          insert_res = mongo.db.insert_one(annotation)
+        # The client should have created an id for this new annotation
+        # Upsert the new annotation so that we create it if its new, or replace it if (e.g) the
+        # user hit the save button twice, so the _id field was never seen by the client.
+        assert 'id' in annotation
+        mongo.db.annotation.replace_one({'id' : annotation['id']}, annotation, upsert=True)
+
+        # if 'id' not in annotation:
+        #   insert_res = mongo.db.annotation.insert_one(annotation, bypass_document_validation=True)
+        #   anno_id =  insert_res.inserted_id
+        #   mongo.db.annotation.update_one({'_id' : anno_id}, {'$set' : {'id' : str(anno_id)}})
+        # else:
+        #   insert_res = mongo.db.insert_one(annotation)
 
   return ""
 

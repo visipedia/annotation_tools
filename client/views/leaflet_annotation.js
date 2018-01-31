@@ -11,6 +11,14 @@ import {Annotation} from './annotation.js';
 import {DefaultEditInstructions, KeypointInstructions, BBoxInstructions} from './instructions.js';
 import {CategorySelectionModal} from './category_selection_modal.js';
 
+// From SO: https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+// When we create a new annotation, we want to assign an `id` to it. We'll use this
+// function to do so.
+function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  )
+}
 
 // Convenience class for creating circular markers of a specific color.
 let ColorableDivIcon = L.DivIcon.extend({
@@ -564,6 +572,7 @@ export class LeafletAnnotation extends React.Component {
 
         // Create the annotation data structure
         var annotation = {
+          'id' : uuidv4(),
           'image_id': this.props.image.id,
           'category_id': category.id,
           'bbox' : null,
