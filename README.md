@@ -24,7 +24,7 @@ This code base is developed using Python 2.7.10 on Ubuntu 16.04 and MacOSX 10.11
 The tools are primarily tested using the [Chrome web browser](https://www.google.com/chrome/browser/desktop/index.html). 
 
 # Quick Start
-Make sure that MongoDB is running. 
+Make sure that MongoDB is installed and running (e.g. for Ubuntu 16.04 see [here](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/#import-the-public-key-used-by-the-package-management-system)). 
 
 Clone the repo:
 ```
@@ -56,6 +56,7 @@ $ python -m annotation_tools.db_dataset_utils --action load \
 --dataset ~/Downloads/annotations/person_keypoints_val2017.json \
 --normalize
 ```
+If you get an error here, then please make sure MongoDB is installed and running.
 
 Go to `http://localhost:8008/edit_image/100238` to edit the annotations for the validation image with `id=100238`. 
 
