@@ -8,6 +8,7 @@ from __future__ import print_function
 import datetime
 import json
 import os
+import random
 
 from flask import Flask, render_template, jsonify, request
 from flask_pymongo import PyMongo
@@ -61,29 +62,40 @@ def edit_image(image_id):
 def edit_task():
   """ Edit a group of images.
   """
-  start=0
-  if 'start' in request.args:
-    start = int(request.args['start'])
-  end=None
-  if 'end' in request.args:
-    end = int(request.args['end'])
 
-  # Find annotations and their accompanying images for this category
-  if 'category_id' in request.args:
-    category_id = request.args['category_id']
-    annos = mongo.db.annotation.find({ "category_id" : category_id}, projection={'image_id' : True, '_id' : False})#.sort([('image_id', 1)])
-    image_ids = list(set([anno['image_id'] for anno in annos]))
-    image_ids.sort()
+  if 'image_ids' in request.args:
 
-  # Else just grab all of the images.
+    image_ids = request.args['image_ids'].split(',')
+
   else:
-    images = mongo.db.image.find(projection={'id' : True, '_id' : False}).sort([('id', 1)])
-    image_ids = [image['id'] for image in images]
 
-  if end is None:
-    image_ids = image_ids[start:]
-  else:
-    image_ids = image_ids[start:end]
+    start=0
+    if 'start' in request.args:
+      start = int(request.args['start'])
+    end=None
+    if 'end' in request.args:
+      end = int(request.args['end'])
+
+    # Find annotations and their accompanying images for this category
+    if 'category_id' in request.args:
+      category_id = request.args['category_id']
+      annos = mongo.db.annotation.find({ "category_id" : category_id}, projection={'image_id' : True, '_id' : False})#.sort([('image_id', 1)])
+      image_ids = list(set([anno['image_id'] for anno in annos]))
+      image_ids.sort()
+
+    # Else just grab all of the images.
+    else:
+      images = mongo.db.image.find(projection={'id' : True, '_id' : False}).sort([('id', 1)])
+      image_ids = [image['id'] for image in images]
+
+    if end is None:
+      image_ids = image_ids[start:]
+    else:
+      image_ids = image_ids[start:end]
+
+    if 'randomize' in request.args:
+      if request.args['randomize'] >= 1:
+        random.shuffle(image_ids)
 
   categories = list(mongo.db.category.find(projection={'_id' : False}))
 

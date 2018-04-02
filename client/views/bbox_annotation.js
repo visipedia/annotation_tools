@@ -298,8 +298,8 @@ export class BBoxAnnotation extends React.Component {
         var [x1, y1, w, h] = annotation.bbox;
         x1 = x1 * imageWidth;
         y1 = y1 * imageHeight;
-        x2 = x1 + w * imageWidth;
-        y2 = y2 + h * imageHeight;
+        let x2 = x1 + w * imageWidth;
+        let y2 = y2 + h * imageHeight;
         let bounds = L.latLngBounds(this.leafletMap.unproject([x1, y1], 0), this.leafletMap.unproject([x2, y2], 0));
         let layer = L.rectangle(bounds, pathStyle);
 
