@@ -282,6 +282,8 @@ python -m annotation_tools.db_bbox_utils --action export \
 --denormalize
 ```
 
+To merge these redundant box annotations together to produce a final dataset you can use the [Crowdsourcing](https://github.com/gvanhorn38/crowdsourcing) repo. See [here](https://github.com/gvanhorn38/crowdsourcing#merging-bounding-boxes-example) for an example.  
+
 We provide a convenience function to clear all collections associated with the bounding boxes tasks:
 ```
 python -m annotation_tools.db_bbox_utils --action drop
