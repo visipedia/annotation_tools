@@ -84,7 +84,8 @@ export class EditSequence extends React.Component {
         method : 'GET'
       }).done(function(data){
         onSuccess(data);
-      }).fail(function(){
+      }).fail(function(jqXHR, textStatus, errorThrown ){
+        console.log(textStatus);
         onFail();
       });
 

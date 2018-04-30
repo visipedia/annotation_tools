@@ -172,7 +172,10 @@ export class BBoxAnnotation extends React.Component {
       let northEast = leafletMap.unproject([width, 0], leafletMap.getMinZoom());
       let bounds = new L.LatLngBounds(southWest, northEast);
       // GVH: The order of these calls matter!
-      leafletMap.fitBounds(bounds);
+      leafletMap.fitBounds(bounds, {
+        animate: false,
+        duration: 0
+      });
       leafletMap.setMaxBounds(bounds);
 
       // Render the image on the map

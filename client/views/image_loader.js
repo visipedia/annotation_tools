@@ -23,7 +23,7 @@ export class ImageLoader extends React.Component {
     render() {
 
         return(
-            <div>
+            <div style={{display : 'none'}}>
                 <img
                     ref={i => { this.image = i; }}
                     src={this.props.url}
