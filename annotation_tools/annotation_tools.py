@@ -14,8 +14,12 @@ from flask import Flask, render_template, jsonify, request
 from flask_pymongo import PyMongo
 from bson import json_util
 
+from annotation_tools import default_config as cfg
+
 app = Flask(__name__)
-app.config.from_object('annotation_tools.default_config')
+#app.config.from_object('annotation_tools.default_config')
+app.config['MONGO_URI'] = 'mongodb://'+cfg.MONGO_HOST+':'+str(cfg.MONGO_PORT)+'/'+cfg.MONGO_DBNAME
+
 if 'VAT_CONFIG' in os.environ:
   app.config.from_envvar('VAT_CONFIG')
 mongo = PyMongo(app)

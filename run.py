@@ -12,6 +12,7 @@ import json
 from annotation_tools.annotation_tools import app
 
 DEFAULT_PORT = 8003
+DEFAULT_HOST = '127.0.0.1'
 
 def parse_args():
 
@@ -25,6 +26,10 @@ def parse_args():
                         help='Port to run on.', type=int,
                         required=False, default=DEFAULT_PORT)
 
+  parser.add_argument('--host', dest='host',
+                        help='Host to run on, set to 0.0.0.0 for remote access', type=str,
+                        required=False, default=DEFAULT_HOST)
+
   args = parser.parse_args()
   return args
 
@@ -32,7 +37,7 @@ def parse_args():
 def main():
   args = parse_args()
 
-  app.run(port=args.port, debug=args.debug)
+  app.run(host=args.host, port=args.port, debug=args.debug)
 
 
 if __name__ == "__main__":
