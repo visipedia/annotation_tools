@@ -78,7 +78,7 @@ Clear the annotation tool database:
 $ python -m annotation_tools.db_dataset_utils --action drop
 ```
 
-# Developement Setup
+# Development Setup
 To modify and develop this code base you will need to have [node](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) installed.
 
 Clone the repo:
