@@ -1,1 +1,1 @@
-web: python run.py --port 8008
+web: gunicorn wsgi:app
