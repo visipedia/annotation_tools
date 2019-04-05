@@ -166,6 +166,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# PyCharm
+.idea
+
 ###################
 # Mac stuff
 .DS_Store

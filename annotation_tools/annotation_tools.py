@@ -18,7 +18,7 @@ from annotation_tools import default_config as cfg
 
 app = Flask(__name__)
 #app.config.from_object('annotation_tools.default_config')
-app.config['MONGO_URI'] = 'mongodb://'+cfg.MONGO_HOST+':'+str(cfg.MONGO_PORT)+'/'+cfg.MONGO_DBNAME
+app.config['MONGO_URI'] = cfg.MONGO_URI
 
 if 'VAT_CONFIG' in os.environ:
   app.config.from_envvar('VAT_CONFIG')
