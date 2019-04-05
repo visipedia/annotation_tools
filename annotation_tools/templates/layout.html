@@ -14,18 +14,29 @@
   {% block navbar %}
   <nav class="navbar navbar-light bg-faded">
     <a class="navbar-brand" href="#">
-      Visipedia Annotation Toolkit
+      PassengerAI Annotation Toolkit
+
     </a>
+    <a href="/edit_task/">
+    Annotate images
+    </a>
+    <br/>
+
+    <span>
+    Forked from <a href="https://github.com/visipedia/annotation_tools">Visipedia</a>
+    </span>
   </nav>
   {% endblock %}
   <div class="container-fluid">
     <div id="app">
       {% block app %}{% endblock %}
     </div>
+
   </div>
   {% block modals %}{% endblock %}
   {% block scripts %}
   <script type="text/javascript" src="{{ url_for('static', filename='app.bundle.js') }}"></script>
   {% endblock %}
+
 
 </body>
