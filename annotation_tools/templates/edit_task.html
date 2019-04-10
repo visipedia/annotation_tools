@@ -35,7 +35,6 @@
 {% block scripts %}
 {{ super() }}
 <script type="text/javascript">
-
   var taskId = {{ task_id|tojson }};
   var imageIds = {{ image_ids|tojson }};
   var categories = {{ categories|tojson }};
