@@ -26,7 +26,6 @@ export class KeypointInfo extends React.Component {
           {this.props.name}
         </th>
         <td>
-          a
           <input
             type="radio"
             aria-label="n/a"

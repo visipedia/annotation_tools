@@ -73,6 +73,8 @@ export class LeafletAnnotation extends React.Component {
     this._currentDrawer = null; // the current drawer used for making the annotation
     this.annotating_keypoint = null; // Are we annotating a keypoint?
     this.annotating_bbox = null; // Are we annotating a bbox?
+    this.selected_marker = null;
+    this.leaflet_ids = {}; // Relate each leaflet to the annotation and keypoint it represents
     this.current_annotationIndex = null; // Which annotation are we modifing? This indexes into this.state.annotations
     this.current_keypointIndex = null; // Which keypoint are we annotating? This indexes into this.state.annotations[<i>].keypoints
     this.new_category_id = null; // If we are creating a new instance, then which category does it belong to?
@@ -237,6 +239,7 @@ export class LeafletAnnotation extends React.Component {
         this.createNewInstance();
         break;
       case V_KEY:
+        console.log("Key pressed");
         this.toggleKeypointVisibility();
         break;
     }
@@ -367,7 +370,23 @@ export class LeafletAnnotation extends React.Component {
             className: "",
             direction: "auto"
           });
+
           this.addLayer(layer);
+          this.leaflet_ids[layer._leaflet_id] = {
+            annotationIndex: annotationIndex,
+            keypointIndex: i
+          };
+          layer.on("click", e => {
+            let self = e.target;
+            let selection = this.leaflet_ids[self._leaflet_id];
+            this.current_annotationIndex = selection.annotationIndex;
+            this.current_keypointIndex = selection.keypointIndex;
+            this.selected_marker = self;
+            console.log(this.selected_marker);
+            //this.annotating_keypoint = true;
+            //this.setState({ annotating: true });
+            //this.toggleKeypointVisibility();
+          });
         }
 
         layers["keypoints"].push(layer);
@@ -648,7 +667,7 @@ export class LeafletAnnotation extends React.Component {
   }
 
   _layerMoved(e) {
-    // console.log(e);
+    console.log(e);
   }
 
   _layerResized(e) {
@@ -691,10 +710,10 @@ export class LeafletAnnotation extends React.Component {
           this.current_keypointIndex == keypointIndex
         ) {
           // cancel the drawer
-
           this.cancelKeypointAnnotation();
         }
       } else {
+        console.log("Going to 0");
         // was this keypoint visible?
         if (prev_visibility > 0) {
           // remove the keypoint layer
@@ -714,7 +733,7 @@ export class LeafletAnnotation extends React.Component {
         });
       }
     } else if (visibility == 1 || visibility == 2) {
-      // Are we currently annotating this keypoing (and just toggled the visibility)
+      // Are we currently annotating this keypoint (and just toggled the visibility)
       if (this.state.annotating) {
         // Are we currently annotating this keypoint?
         if (
@@ -723,16 +742,18 @@ export class LeafletAnnotation extends React.Component {
           this.current_keypointIndex == keypointIndex
         ) {
           // Not the most elegant...
-          if (this._currentDrawer._marker != undefined) {
+          let marker = this.selected_marker;
+          if (this._currentDrawer) marker = this._currentDrawer._marker;
+          if (marker != undefined) {
             let annotation = this.state.annotations[annotationIndex];
             let category = this.categoryMap[annotation["category_id"]];
             let keypoint_color = category["keypoints_style"][keypointIndex];
             if (visibility == 1) {
-              this._currentDrawer._marker.getElement().style.background = this.createKeypointStripedBackgroundStyle(
+              marker.getElement().style.background = this.createKeypointStripedBackgroundStyle(
                 keypoint_color
               );
             } else {
-              this._currentDrawer._marker.getElement().style.background = this.createKeypointSolidBackgroundStyle(
+              marker.getElement().style.background = this.createKeypointSolidBackgroundStyle(
                 keypoint_color
               );
             }
@@ -812,15 +833,19 @@ export class LeafletAnnotation extends React.Component {
    * Toggling from 1 -> 0 will cancel the annotation.
    */
   toggleKeypointVisibility() {
-    console.log(this.state);
-    console.log(this.current_keypointIndex);
-    if (this.state.annotating && this.annotating_keypoint) {
+    console.log(
+      `toggling ${this.state.annotating}, ${this.annotating_keypoint}`
+    );
+    //if (this.state.annotating && this.annotating_keypoint)
+    {
       let annotationIndex = this.current_annotationIndex;
       let keypointIndex = this.current_keypointIndex;
       let current_visibility = this.state.annotations[annotationIndex][
         "keypoints"
       ][keypointIndex * 3 + 2];
-
+      console.log(
+        `toggling ${annotationIndex}.${keypointIndex}=${current_visibility}`
+      );
       if (current_visibility == 2) {
         this.handleKeypointVisibilityChange(annotationIndex, keypointIndex, 1);
       } else if (current_visibility == 1) {
@@ -835,7 +860,7 @@ export class LeafletAnnotation extends React.Component {
   cancelKeypointAnnotation() {
     // cancel the drawer
     this._drawSuccessfullyCreated = true;
-    this._currentDrawer.disable();
+    if (this._currentDrawer) this._currentDrawer.disable();
     this._currentDrawer = null;
 
     let annotationIndex = this.current_annotationIndex;
@@ -930,7 +955,7 @@ export class LeafletAnnotation extends React.Component {
    */
   cancelBBoxAnnotation() {
     this._drawSuccessfullyCreated = true;
-    this._currentDrawer.disable();
+    if (this._currentDrawer) this._currentDrawer.disable();
     this._currentDrawer = null;
 
     this.annotating_bbox = false;
