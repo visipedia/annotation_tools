@@ -117,6 +117,7 @@ def save_annotations():
   annotations = json_util.loads(json.dumps(request.json['annotations']))
 
   for annotation in annotations:
+    annotation['updated_at'] = datetime.datetime.utcnow()
     # Is this an existing annotation?
     if '_id' in annotation:
       if 'deleted' in annotation and annotation['deleted']:
