@@ -123,7 +123,7 @@ def body_25_to_coco_18(keypoints: List[float]) -> List[float]:
     BODY_25 to COCO_18 key mapping based on the following:
     https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/output.md
 
-    The onlny difference is that COCO_18 doesn't have the MidHip (#8), Toes,
+    The only difference is that COCO_18 doesn't have the MidHip (#8), Toes,
     Heels and Background (#19-#25) keypoints.
 
     """
@@ -168,30 +168,17 @@ def get_bbox(keypoints: List[float], max_width, max_height) -> List[float]:
 
 
 def convert_json(file_path: str, image_id: int):
+    file_name = os.path.basename(file_path)[:-15]
+    out, width, height = image_to_json(file_name, image_id)
     with open(file_path) as fp:
         openpose_json = json.load(fp)
-        file_name = os.path.basename(file_path)[:-15]
-        img_path = f"/Users/ali/martin-jsons/images/{file_name}.jpg"
-        im = Image.open(img_path)
-        width, height = im.size
-        # im.thumbnail((1280, 960))
-        # im.save(img_path, "JPEG")
-        url = f'{S3_PREFIX}/{quote_plus(file_name)}.jpg'
-        out = {
-            "images": [{"id": image_id,
-                        "url": url,
-                        "width": width,
-                        "height": height,
-                        }],
-            "annotations": []}
-
-        id = 1
+        annotation_id = 1
         for people in openpose_json["people"]:
             keypoints = body_25_to_coco_18(people["pose_keypoints_2d"])
             keypoints = keypoints_to_visible(keypoints)
             assert len(keypoints) == NUM_OF_KEYPOINTS * 3, len(keypoints)
             annotation = {
-                "id": f'{image_id}_annotat_{id}',
+                "id": f'{image_id}_annotat_{annotation_id}',
                 "image_id": image_id,
                 "num_keypoints": NUM_OF_KEYPOINTS,
                 "iscrowd": 0,
@@ -201,9 +188,26 @@ def convert_json(file_path: str, image_id: int):
                 "updated_at": None
             }
             out["annotations"].append(annotation)
-            id += 1
+            annotation_id += 1
 
-        return out
+    return out
+
+
+def image_to_json(img_path, image_id):
+    file_name = os.path.basename(img_path)
+    im = Image.open(img_path)
+    width, height = im.size
+    # im.thumbnail((1280, 960))
+    # im.save(img_path, "JPEG")
+    url = f'{S3_PREFIX}/{quote_plus(file_name)}'
+    out = {
+        "images": [{"id": image_id,
+                    "url": url,
+                    "width": width,
+                    "height": height,
+                    }],
+        "annotations": []}
+    return out, width, height
 
 
 def convert_files(keypoints_path: str, output_file: str):
@@ -213,6 +217,26 @@ def convert_files(keypoints_path: str, output_file: str):
 
     for filepath in glob.iglob(f'{keypoints_path}/*.json'):
         single_row = convert_json(filepath, id)
+        d["images"] += single_row["images"]
+        d["annotations"] += single_row["annotations"]
+        id += 1
+        if id % 100 == 0:
+            print(f'{id} images processed')
+
+    d.update(COCO_HEADER)
+    with open(output_file, 'w') as fp:
+        json.dump(d, fp)
+
+    return d
+
+
+def from_images(images_path: str, output_file: str):
+    id = 1
+    d: Dict[str, object] = {"images": [],
+                            "annotations": []}
+
+    for filepath in glob.iglob(f'{images_path}/*.jpg'):
+        single_row, _, _ = image_to_json(filepath, id)
         d["images"] += single_row["images"]
         d["annotations"] += single_row["annotations"]
         id += 1
