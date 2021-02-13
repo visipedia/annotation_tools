@@ -209,6 +209,9 @@ export class LeafletAnnotation extends React.Component {
       let S_KEY = 83; // Save annotations
       let N_KEY = 78; // New instance
       let V_KEY = 86; // Toggle visibility
+      let ONE_KEY = 49
+      let TWO_KEY = 50
+      let THREE_KEY = 51
 
 
       switch(e.keyCode){
@@ -236,6 +239,27 @@ export class LeafletAnnotation extends React.Component {
         case V_KEY:
           this.toggleKeypointVisibility();
           break;
+        // Remove the nose
+        case ONE_KEY:
+          console.log("Heere")
+          console.log(this.current_annotationIndex)
+          if (this.current_annotationIndex != null) {
+            this.handleKeypointVisibilityChange(this.current_annotationIndex, 0, 0, true);
+          }
+          break;
+        // Remove the left eye
+        case TWO_KEY:
+          if (this.current_annotationIndex != null) {
+            this.handleKeypointVisibilityChange(this.current_annotationIndex, 1, 0, true);
+          }
+          break;
+        // Remove the right eye
+        case THREE_KEY:
+          if (this.current_annotationIndex != null) {
+            this.handleKeypointVisibilityChange(this.current_annotationIndex, 2, 0, true);
+          }
+          break;
+
       }
 
     }
@@ -638,6 +662,7 @@ export class LeafletAnnotation extends React.Component {
     checkKeypointAnnotationQueue(){
       // When a new instance is created we can queue up the keypoints to annotate
       if (this.annotation_keypoint_queue.length > 0){
+        console.log(this.annotation_keypoint_queue)
         let anno = this.annotation_keypoint_queue.shift();
         this.handleKeypointVisibilityChange(anno['annotationIndex'], anno['keypointIndex'], 2);
       }
@@ -659,22 +684,25 @@ export class LeafletAnnotation extends React.Component {
      * @param {*} keypointIndex
      * @param {*} visibility
      */
-    handleKeypointVisibilityChange(annotationIndex, keypointIndex, visibility){
-      //console.log("annotation " + annotationIndex + " keypoint " + keypointIndex + " vis " + visibility);
+    handleKeypointVisibilityChange(annotationIndex, keypointIndex, visibility, force_delete = false){
+      console.log("annotation " + annotationIndex + " keypoint " + keypointIndex + " vis " + visibility);
 
       // If we are in the middle of annotating something else, then ignore this request
       if (this.state.annotating){
-          if (!(this.current_annotationIndex == annotationIndex && this.annotating_keypoint && this.current_keypointIndex == keypointIndex)){
+          if (!force_delete && !(this.current_annotationIndex == annotationIndex && this.annotating_keypoint && this.current_keypointIndex == keypointIndex)){
             return;
           }
       }
 
       let prev_visibility = this.state.annotations[annotationIndex]['keypoints'][keypointIndex * 3 + 2];
 
+      console.log("Here698")
       if (visibility == 0){
 
+        console.log("Here700")
         // Are we currently annotating?
-        if (this.state.annotating){
+        if (this.state.annotating && !force_delete){
+          console.log("Here704")
           // Are we currently annotating this keypoint?
           if (this.current_annotationIndex == annotationIndex && this.annotating_keypoint && this.current_keypointIndex == keypointIndex){
             // cancel the drawer
@@ -686,6 +714,7 @@ export class LeafletAnnotation extends React.Component {
         else{
           // was this keypoint visible?
           if (prev_visibility > 0){
+            console.log("Here714")
             // remove the keypoint layer
             let keypoint_layer = this.annotation_layers[annotationIndex]['keypoints'][keypointIndex];
             this.annotationFeatures.removeLayer(keypoint_layer);
@@ -758,6 +787,7 @@ export class LeafletAnnotation extends React.Component {
 
           }
           else{
+            console.log("789")
             // we need to annotate this keypoint
             let annotation = this.state.annotations[annotationIndex];
             let category = this.categoryMap[annotation['category_id']];
@@ -1211,10 +1241,13 @@ export class LeafletAnnotation extends React.Component {
      */
     handleAnnotateKeypoints(annotationIndex){
 
+      console.log("handle annotate keypoints")
       if (this.state.annotating){
         // ignore
         return;
       }
+
+      this.current_annotationIndex = annotationIndex
 
       let annotation = this.state.annotations[annotationIndex];
       let annotation_layer = this.annotation_layers[annotationIndex];

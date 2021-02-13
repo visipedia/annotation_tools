@@ -8,17 +8,17 @@ module.exports = {
     filename: "[name].bundle.js"
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js?$/,
         loader: 'babel-loader',
-        query: {
+        options: {
           presets: ['es2015', 'react']
         },
         exclude: /node_modules/
       },
       {
-        test: /\.css$/, loader: 'style-loader!css-loader'
+        test: /\.css$/, use: ['style-loader', 'css-loader'],
       }
     ]
   },
@@ -30,5 +30,5 @@ module.exports = {
         Popper: ['popper.js', 'default'] // Bootstrap 4 dependence
     })
   ],
-  devtool: "cheap-eval-source-map"
+  devtool: "eval"
 };
