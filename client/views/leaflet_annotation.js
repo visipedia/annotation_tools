@@ -660,9 +660,10 @@ export class LeafletAnnotation extends React.Component {
      * We can queue up keypoint annotations and iterate through them.
      */
     checkKeypointAnnotationQueue(){
+      console.log("Annotation keypoint queue", this.annotation_keypoint_queue)
       // When a new instance is created we can queue up the keypoints to annotate
       if (this.annotation_keypoint_queue.length > 0){
-        console.log(this.annotation_keypoint_queue)
+        
         let anno = this.annotation_keypoint_queue.shift();
         this.handleKeypointVisibilityChange(anno['annotationIndex'], anno['keypointIndex'], 2);
       }
@@ -718,6 +719,11 @@ export class LeafletAnnotation extends React.Component {
             // remove the keypoint layer
             let keypoint_layer = this.annotation_layers[annotationIndex]['keypoints'][keypointIndex];
             this.annotationFeatures.removeLayer(keypoint_layer);
+
+            if (force_delete) {
+               this.annotation_layers[annotationIndex]['keypoints'][keypointIndex] = null;
+            }
+            console.log('annotation layer' + this.annotation_layers[annotationIndex]['keypoints'][keypointIndex])
           }
 
           this.setState(function(prevState, props){
@@ -762,6 +768,7 @@ export class LeafletAnnotation extends React.Component {
 
           // Does a layer exist for this keypoint?
           var keypoint_layer = this.annotation_layers[annotationIndex]['keypoints'][keypointIndex];
+          console.log('keypoint_layer ' + keypoint_layer)
           if(keypoint_layer != null){
             if (prev_visibility == 0){
               // just render the existing layer
@@ -1264,6 +1271,7 @@ export class LeafletAnnotation extends React.Component {
         for (var j=0; j < category.keypoints.length; j++){
           let index = j * 3;
           let visibility = annotation.keypoints[index + 2];
+          console.log('j ' + j + 'visibility ' + visibility)
           if (visibility == 0){
             this.annotation_keypoint_queue.push({
               'annotationIndex' : annotationIndex,
