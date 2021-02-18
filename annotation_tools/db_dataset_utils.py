@@ -282,7 +282,7 @@ def main():
   elif action == 'export':
     dataset = export_dataset(db, denormalize=args.denormalize)
     with open(args.output_path, 'w') as f:
-      json.dump(dataset, f)
+      json.dump(dataset, f, indent=4)
 
 if __name__ == '__main__':
 
